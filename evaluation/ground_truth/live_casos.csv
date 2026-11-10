@@ -9,4 +9,9 @@ noche_ir,36,7DUX432,si,
 noche_ir,41,,no,"auto chico abajo a la derecha, de costado; la patente no se llega a leer a ojo"
 noche_ir,43,6XVA709,si,
 noche_ir,45,7HJP626,si,
+ingreso_dia_noche,2,3RDP98,si,"EE.UU.; cámara de patentes frente al carril de ingreso, de día"
+ingreso_dia_noche,8,4NKH74,si,"de día"
+ingreso_dia_noche,13,5FNH56,si,"de noche, infrarrojo"
+ingreso_dia_noche,21,RN824,si,"de noche; letras apiladas (R sobre N), el lector no está entrenado para ese formato"
+ingreso_dia_noche,27,2YDP53,si,"de noche"
 camion_porton,6,WRP3975,si,"camión llegando al portón de una planta; video promocional con zoom (sin detección de cortes: --cut-threshold 0)"

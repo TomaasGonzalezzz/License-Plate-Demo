@@ -8,15 +8,9 @@ No video or image dataset is stored in this repository. Everything below is down
 | --- | --- | --- | --- | --- |
 | `pexels-38118760.mp4` (main demo) | Residential street in Argentina, fixed camera on a tripod, 3840x2160 at 24 fps, 58 s. Trucks, armoured vans, cars and a motorcycle drive towards the camera and turn; Argentine plates (old format and Mercosur) are legible in 4K. | [Pexels 38118760](https://www.pexels.com/video/scenic-urban-neighborhood-with-cargo-trucks-38118760/) | Santiago Balbuena | [Pexels License](https://www.pexels.com/license/): free to use and modify, no attribution required (given anyway). Not to be resold unaltered or presented as your own footage. |
 
-Download (the Pexels page also has a "Free download" button):
-
-```sh
-curl -L -o pexels-38118760.mp4 https://www.pexels.com/download/video/38118760/
-```
-
 ### Videos that were checked and not used
 
-Searched first, as asked, for public videos with Argentine plates and a clear license:
+Searched first for public videos with Argentine plates and a clear license:
 
 | Video | License | Why it was not used |
 | --- | --- | --- |
@@ -35,10 +29,6 @@ Most YouTube videos about Argentine plate readers (municipal systems, vendor dem
 | Set | Contents | Source | License |
 | --- | --- | --- | --- |
 | `arg_plate_benchmark` | 147 cropped plates from Argentina with their text: 68 Mercosur, 75 old format, 4 motorcycle plates | [fast-plate-ocr release `arg-plates`](https://github.com/ankandrew/fast-plate-ocr/releases/download/arg-plates/arg_plate_benchmark.zip), by ankandrew | **Not stated.** Used only to measure, never copied into this repo. |
-
-```sh
-curl -L -o arg_plate_benchmark.zip https://github.com/ankandrew/fast-plate-ocr/releases/download/arg-plates/arg_plate_benchmark.zip
-```
 
 Caveat: this set comes from the same author as the OCR models. It is published as a benchmark, separate from the training set, but it is likely the same kind of images (same cameras, same cropping), so it is a friendly test. Plates cropped by our own detector in a real video are harder; see [EVALUATION.md](EVALUATION.md).
 

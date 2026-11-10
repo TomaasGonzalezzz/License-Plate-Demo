@@ -1,138 +1,67 @@
-<div align="center">
-
 # License Plate Demo
+### License plate reading and vehicle access control
 
-**Read the plates of vehicles crossing a gate in a video, check them against access lists, and keep a register of who is still inside.**
+A system for the gate of a gated community, a building or a plant. It reads the plate of every vehicle that arrives, checks it against the lists of residents, visitors and suppliers, and logs every entry with the time and a photo. It raises an alert the moment something does not match, and always knows who is still inside. It runs live on existing cameras, on an ordinary computer.
 
-![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
-![License: MIT](https://img.shields.io/badge/license-MIT-green)
-![No AGPL](https://img.shields.io/badge/AGPL-none-lightgrey)
+**Tomás González** · Individual project · November 2026
 
-[Leer en español](README.md) · [How it was evaluated](docs/EVALUATION.md) · [Live mode](docs/LIVE.md) · [Data and licenses](docs/DATA.md)
+[Live mode](docs/LIVE.md) · [Evaluation](docs/EVALUATION.md) · [Data and licenses](docs/DATA.md) · [Leer en español](README.md)
 
-<img src="demo/demo.gif" alt="Animated: each vehicle gets a box, its plate in large type and a colour for its status; a side panel lists the last events and who is still inside" width="900">
+**Result:** with a plate camera facing the entry lane, it logged all 5 cars in the video with the right status (resident, visitor, supplier or unknown), day and night, in all three real-time runs. On 147 Argentine plates, the reader got 140 right.
 
-<sub>Video: Santiago Balbuena, Pexels (Pexels License), overlay added. Names in the lists are invented.</sub>
+<img src="demo/casos/ingreso_dia_noche.gif" alt="Camera facing the entry lane: each car with its plate read and its status, and on the side the latest events and who is still inside" width="900">
 
-</div>
+<sub>[Full video](demo/casos/ingreso_dia_noche.mp4) · Original video: [CCTV Camera World / Avalonix, YouTube f2e7deJnfMc](https://www.youtube.com/watch?v=f2e7deJnfMc), analysis overlay added. US plates; names and lists are invented.</sub>
 
-A computer-vision demo applied to vehicle access control. You give it a video from a fixed camera (or an RTSP stream from a recorder), a line that marks the gate, and three CSV lists (residents, suppliers, visitors with their allowed hours). For every vehicle that crosses the line it records the time, the plate, a confidence score, the status (`residente`, `visita`, `proveedor`, `desconocido` or `no leída`) and whether it went in or out, and it keeps a running list of who is still inside. Everything runs on a CPU and every component has a permissive license (no AGPL).
+## How it was built
 
-## Results at a glance
+### 1. Find the plate
 
-Main clip: a residential street in Argentina, 4K, fixed camera, 58 s, seven vehicles cross the gate line. Plates were read by hand from enlarged crops **before** running the model.
+A plate detector looks at the barrier zone in every frame that comes from the camera. When nothing moves it does not analyse, and it always takes the newest frame, so it never falls behind what happens at the gate. Each plate gets its own ID while it is in view.
 
-| | Result |
+### 2. Read it many times and keep the most reliable reading
+
+While the car approaches or waits, the plate is read in many frames. Each character is decided by a vote in which sharper, closer readings weigh more. The format is then checked (Argentine old and Mercosur, cars and motorcycles, or another country's) and typical confusions are fixed, such as an `O` read where a `0` must go. On 147 cropped Argentine plates the reader got **140 right (95.2 %)**: all 68 Mercosur plates and 72 of 79 old-format and motorcycle plates.
+
+### 3. Check it against the lists
+
+The plate is looked up in the lists of residents, visitors (with their allowed hours) and suppliers. The match tolerates one misread character when it is a typical confusion (`O`/`0`, `I`/`1`, `B`/`8`), so a resident is not turned away by an imperfect reading.
+
+<img src="figures/lecturas.jpg" alt="Seven vehicles from different videos: the vehicle crop, the plate crop, the final reading and the status the system assigned" width="900">
+
+### 4. Log and alert instantly
+
+Each entry is written the moment it happens, with time, plate, status and a photo of the plate. A plate that is not on the lists, could not be read, or belongs to a visitor outside their hours raises an alert. The system keeps track of who came in and has not left yet, and warns when a vehicle leaves without a logged entry.
+
+### 5. Test it in different situations
+
+Each video was played three times in real time on a laptop without a GPU (3 to 7 analysed frames per second), and I wrote down every plate by hand to compare:
+
+| Situation | Result |
 | --- | :---: |
-| Gate crossings detected | **7 of 7**, 0 false |
-| Status right (resident / visitor / supplier / unknown / unread) | **7 of 7** |
-| Legible plates read exactly | 3 of 5 (30 of 32 characters) |
-| Plates read with one wrong character, still matched to the right list entry | 2 (`GIE 291` for `GEE 291`, `HWE 273` for `HME 273`) |
-| Illegible plates (motorcycle seen from the front, dark car against the light) | 2 of 2 reported as `no leída`, none invented |
-| Speed (low-power laptop CPU, i7-10510U, 4K input, 1 of 2 frames) | 1.1 frames/s |
-
-**This is one clip and seven vehicles, and the tracking rules were adjusted while looking at it** (the first, untouched run got 3 statuses right out of 7 and no plate fully right; every step is in [EVALUATION.md](docs/EVALUATION.md)). On a separate set of 147 cropped Argentine plates, the plate reader alone gets **140 right (95.2 %)**: 68 of 68 Mercosur, 72 of 79 old-format and motorcycle plates.
-
-## What it does
-
-```text
- video / RTSP ──► RF-DETR ──► ByteTrack ──► plate detector ──► fast-plate-ocr ──► vote across frames
-  (4K kept for    (vehicles   (one ID per   (on the full-res    (text + per-char    (per character,
-   plate crops)    on 1280 px) vehicle)      vehicle crop)       confidence)          weighted by size)
-                                                                                        │
-   annotated.mp4 ◄── register: who is inside ◄── gate line: in / out ◄── access lists ◄─┘
-   events.csv          (start state + entries      (side change, confirmed,   (format check, tolerant
-   recortes/            − exits; exits without      stabilised against         match: O/0, I/1, B/8...)
-   resumen.txt          an entry are flagged)       camera movement)
-```
-
-1. **Detect and track vehicles.** [RF-DETR](https://github.com/roboflow/rf-detr) Nano (Apache-2.0, COCO weights, run as ONNX) on a 1280 px copy of each frame; ByteTrack from Roboflow's [trackers](https://github.com/roboflow/trackers) (Apache-2.0) gives each vehicle a steady ID. Same models as my [counting demo](https://github.com/TomaasGonzalezzz/Object-Counting-Demo).
-2. **Find and read the plate** on the **full-resolution** crop of each vehicle: plate detector from [open-image-models](https://github.com/ankandrew/open-image-models) and OCR from [fast-plate-ocr](https://github.com/ankandrew/fast-plate-ocr) (MIT code).
-3. **Vote across frames.** A plate is read in many frames. Each reading is weighted by its confidence squared and the plate's size; the 12 best vote character by character. A single sharp close-up beats several blurry far readings.
-4. **Validate the format.** Argentine cars `ABC 123` and `AB 123 CD`, motorcycles `123 ABC` and `A 123 BCD`. Letters read where digits go (`O`→`0`, `I`→`1`...) are fixed by position, at most two per reading. Other countries: `--format "LLL NNNN"`.
-5. **Match the lists, tolerantly.** Edit distance where swapping look-alike characters costs 0.25 instead of 1; a reading matches if the distance is ≤ 1. Visitors outside their hours are flagged.
-6. **Gate line.** In or out depends on the side the vehicle crosses to. To avoid false crossings: two confirming frames, 20 px past the line, and a track whose box jumps or changes size abruptly (two vehicles side by side, a trailer that comes and goes) starts over. `--stabilize` follows small camera movements so the line stays on the road.
-7. **Register.** Entries add, exits remove the closest plate inside. It can start from a saved state and writes the final one, so it carries over from one run to the next.
-
-| Output | Contents |
-| --- | --- |
-| `annotated.mp4` | Boxes, IDs, the plate in large type with its status colour, the gate line, last events and who is still inside |
-| `events.csv` | time, video second, ID, plate, confidence, status, direction, list name, note, number of readings, crop paths |
-| `recortes/` | Best plate crop and vehicle crop per event |
-| `resumen.txt`, `resumen.json` | Closing summary: entries, exits, unknown, unread, who is still inside, exits without an entry |
-| `estado_final.csv` | Who is still inside, reusable as `--inside` next time |
-| `readings.csv`, `tracks.csv`, `run.json` | Every OCR reading, every tracked box, settings and timings |
-
-## Run it
-
-Windows, macOS or Linux, Python 3.11+, about 400 MB of dependencies (no PyTorch).
-
-```sh
-git clone <this repo> && cd License-Plate-Demo
-uv sync                      # or: python -m venv .venv && .venv/Scripts/pip install -e .
-curl -L -o pexels-38118760.mp4 https://www.pexels.com/download/video/38118760/
-
-uv run python -m platedemo pexels-38118760.mp4 --line 0,480,1280,480 --flip --stabilize \
-  --lists data/listas --inside data/listas/estado_inicial.csv --clock 10:15:00 --out out
-```
-
-Model weights (about 40 MB) download on the first run. `--device dml` uses any DirectX 12 GPU on Windows through ONNX Runtime DirectML (AMD Radeon included) and falls back to the CPU if it fails. `--no-video` skips the annotated video. A recorder works the same way: pass `rtsp://user:pass@192.168.0.20:554/...` instead of a file. Check the result against the ground truth:
-
-```sh
-uv run python -m platedemo.evaluate events out/events.csv evaluation/ground_truth/porteria_pexels.csv --lists data/listas
-uv run pytest -q
-```
-
-## Live mode
-
-`--live` is the real-time version for a gate camera: no vehicle detector, plates read directly in a zone near the gate, frames dropped when the CPU is busy (as with a camera), and each event written the moment it happens. Each clip played at real speed three times on the same laptop CPU (ranges, since results vary with timing):
-
-| Clip | Plates right | Analysed frames/s | Kept up |
-| --- | :---: | :---: | :---: |
-| Gate-style entrance, day and night (LPR camera in front of the lane) | 3 to 4 of 5 | 6.5 to 11 | 3 of 3 |
-| Exit from behind, day and night | 1 to 2 of 2 | 6.2 to 6.6 | 3 of 3 |
-| Argentine street at 1080p (general street camera, small plates) | 0 to 2 of 5 | 3.3 to 5.6 | 3 of 3 |
-
-A second round used clips where vehicles stop in front of the camera, as at a gated-community barrier (`--trigger zona`), after fixing what those clips exposed:
-
-| Clip | Right status | Analysed frames/s |
-| --- | :---: | :---: |
-| Parking barrier, day (cars stop) | 2 of 2 in every run | 2.6 to 7.2 |
-| Night, infrared, cars waiting at the gate | 4 to 6 of 6 legible plates | 3.5 to 7.7 |
-| Truck arriving at a plant gate | 1 of 1 in every run | 4.4 to 7.5 |
-
-With a camera placed for plates it works in real time on a laptop, with occasional misses (mostly at night); a general street camera is not enough. Details, commands and what it does not see: [docs/LIVE.md](docs/LIVE.md).
-
-What the live mode showed in each second-round case, recorded during the real-time run (invented lists):
+| Entry with a plate camera, day and night | 5 of 5 cars with the right status in all three runs (4 of 5 plates exact: the fifth has two lines; one run added an extra alert) |
+| Parking barrier, cars that stop | 2 of 2 in all three runs |
+| Truck arriving at a plant gate | 1 of 1 in all three runs |
+| Night entry with a low-resolution infrared camera | 4 to 6 of 6 legible plates, depending on the run |
 
 | Case | Preview | Full video | Original video |
 | --- | --- | --- | --- |
 | Parking barrier, day | [GIF](demo/casos/barrera_dia.gif) | [MP4](demo/casos/barrera_dia.mp4) | [YouTube oJ1sAD7IoNs](https://www.youtube.com/watch?v=oJ1sAD7IoNs), 0:48 to 1:10 |
-| Night, infrared | [GIF](demo/casos/noche_infrarrojo.gif) | [MP4](demo/casos/noche_infrarrojo.mp4) | [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo), 1:43 to 2:32 |
 | Truck at a plant gate | [GIF](demo/casos/camion_porton.gif) | [MP4](demo/casos/camion_porton.mp4) | [YouTube xSYAfvnfUg4](https://www.youtube.com/watch?v=xSYAfvnfUg4), first 7 s |
+| Night, infrared | [GIF](demo/casos/noche_infrarrojo.gif) | [MP4](demo/casos/noche_infrarrojo.mp4) | [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo), 1:43 to 2:32 |
 
-<img src="demo/casos/barrera_dia.gif" alt="A car stopped at a barrier with its plate read and its status, and the panel of entries and who is still inside" width="760">
+### 6. Measure it on an Argentine street
 
-## Limitations
+Besides the live mode, there is a version for recorded video that also tracks every vehicle, even when its plate cannot be seen. On a 58-second clip of an Argentine street filmed in 4K, with the plates written down by hand before the run, it detected all 7 vehicles that drove past, with no false ones, and gave all 7 the right status. The two plates that could not be read (a motorcycle seen from the front and a car against the light) were reported as unread, with nothing made up. Details in [EVALUATION.md](docs/EVALUATION.md).
 
-- **One clip, seven vehicles, tuned on it.** The numbers show the pipeline works end to end on real Argentine plates; they are not an accuracy rate. Before promising a number to anyone, it has to be measured on their camera.
-- **Plate size decides almost everything.** Here plates are 60 to 160 px wide in 4K. Below about 80 px, reading errors go up quickly. A dedicated plate camera (front-on, 3 to 8 m, infrared at night) matters more than any model change.
-- **No real entries in the clip.** Every vehicle drives towards the camera, so the demo treats it as the exit lane; entries and the in/out cross-check are covered by tests and by loading a starting state.
-- **Speed.** About 1.1 frames per second on a low-power laptop with 4K input; real time needs a 1080p stream, fewer frames per second or a GPU.
-- **Plate detector weights have no stated license** (see [DATA.md](docs/DATA.md)). Code is MIT; confirm the weights or retrain before any commercial use.
-- **Personal data.** Plates linked to people are personal data (Argentina: Ley 25.326). A real deployment needs signage, short retention and restricted access. No face recognition is used or needed.
+## Conclusion
 
-## Repository
+The system works end to end and in real time on an ordinary computer. What matters most is not the model but the camera: with a camera placed to read plates and a car that stops at the barrier, readings are solid; with small plates, or at night with low resolution, some are missed. In a real installation the first step is to check the camera placement and measure on its own images.
 
-```text
-src/platedemo/     formats, matching, voting, gate, stabilize, models, pipeline, live, draw, video, evaluate, cli
-data/              invented access lists and starting states (one folder per test clip)
-evaluation/        hand-made ground truth and clip settings
-results/           saved outputs of the final offline run (events, readings, tracks, summary, crops)
-demo/              demo.mp4 and demo.gif
-figures/           README images
-docs/              EVALUATION.md, LIVE.md, DATA.md
-tests/             formats, tolerant matching, voting, in/out and register, stabilisation, live tracking
-```
+## Limits and care
 
-MIT license. Videos and datasets are not included; see [docs/DATA.md](docs/DATA.md).
+- **Few test videos.** The results show that the system works; the real figure has to be measured on each site's camera.
+- **A vehicle without a legible plate** does not create an event in live mode. A presence sensor at the barrier, or running the vehicle detector every few frames, covers it.
+- **Personal data.** A plate that can be linked to a person is personal data (Argentina: Ley 25.326). A real installation needs a CCTV sign, short retention and restricted access. No face recognition is used.
+
+MIT license. The plate detector weights do not state a license: confirm them or retrain before commercial use ([DATA.md](docs/DATA.md)). The Argentine street is Pexels video 38118760 by Santiago Balbuena (Pexels License).

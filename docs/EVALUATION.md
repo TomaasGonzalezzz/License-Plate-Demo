@@ -87,11 +87,7 @@ For live use: a 1080p stream instead of 4K, about 5 analysed frames per second (
 
 ## 2. The plate reader on Argentine plates
 
-Set: `arg_plate_benchmark` (147 cropped plates; [DATA.md](DATA.md)). Command:
-
-```sh
-python -m platedemo.evaluate ocr PATH/benchmark --json results/ocr_benchmark_arg.json
-```
+Set: `arg_plate_benchmark` (147 cropped plates; [DATA.md](DATA.md)).
 
 | OCR model | Right | Mercosur | Old format and motorcycle |
 | --- | :---: | :---: | :---: |
@@ -105,14 +101,3 @@ Caveats:
 - The two Argentine-only models were also tried on the clip in an early probe and did worse than the global one on the Mercosur plates of the armoured vans (for example `AB677MD` and `AZ991UL` for `AG 279 XC`), which is why the global model is the default.
 - The format check (with the motorcycle formats and at most two fixes per reading) gives the same count as the raw readings: it never turns a right reading into a wrong one on this set. Before the motorcycle formats were added, it broke one correct motorcycle reading, because 4 of the 147 labels are motorcycle plates.
 
-## How to reproduce
-
-```sh
-# full pipeline on the clip, then score it
-python -m platedemo pexels-38118760.mp4 --line 0,480,1280,480 --flip --stabilize \
-  --lists data/listas --inside data/listas/estado_inicial.csv --clock 10:15:00 --out out
-python -m platedemo.evaluate events out/events.csv evaluation/ground_truth/porteria_pexels.csv --lists data/listas
-
-# the saved final run, without running any model
-python -m platedemo.evaluate events results/porteria_pexels/events.csv evaluation/ground_truth/porteria_pexels.csv --lists data/listas
-```

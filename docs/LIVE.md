@@ -2,17 +2,6 @@
 
 `--live` is the version meant for a camera at a gate: it keeps up with the video as it arrives and writes each event the moment it happens. Tested on three clips played at their real speed, as if they were the camera, on a low-power laptop CPU (Intel i7-10510U, 15 W, no GPU).
 
-```sh
-# barrier where cars stop: an event when the plate is read inside the zone
-python -m platedemo video.mp4 --live --trigger zona --lane entra --read-zone 100,250,1200,640 --lists data/listas_entrada --out out
-
-# gate line: in or out depending on the side the plate crosses to
-python -m platedemo video.mp4 --live --line 0,500,1280,500 --flip --read-zone 0,300,1280,720 --lists data/listas --out out
-
-# a recorder's camera (Hikvision example); --show opens a window with the annotated image
-python -m platedemo "rtsp://user:pass@192.168.0.20:554/Streaming/Channels/101" --live --trigger zona --read-zone ... --show --out out
-```
-
 Each event is printed, appended to `events.csv` and, if it is unknown or unread, to `alertas.csv`. `live_run.json` has the speed figures; `plates.csv` every plate box and reading.
 
 ## What changes compared with the offline pipeline
@@ -55,19 +44,14 @@ An earlier round of repeats, run while video encoding was using the CPU in the b
 
 ## Second round: clips where vehicles stop (barrier style)
 
-At a gated community the car stops for a few seconds in front of the guard. That is much easier than a street: the plate stays in view, big and still. Three more clips were chosen for that situation and run with `--trigger zona`:
-
-```sh
-python -m platedemo barrera_dia.mp4   --live --trigger zona --lane entra --format "LLL NNNN"  --lists data/listas_barrera --clock 11:20:00 --save-video --out out
-python -m platedemo noche_ir.mp4      --live --trigger zona --lane entra --format "N LLL NNN" --lists data/listas_noche   --clock 20:31:00 --min-live-plate-width 55 --plate-threshold 0.15 --save-video --out out
-python -m platedemo camion_porton.mp4 --live --trigger zona --lane entra --format "LLL NNNN"  --lists data/listas_camion  --clock 07:45:00 --cut-threshold 0 --save-video --out out
-```
+At a gated community the car stops for a few seconds in front of the guard. That is much easier than a street: the plate stays in view, big and still. Three more clips were chosen for that situation and run in zone mode (an event when the plate is read inside the barrier zone).
 
 | Clip | Situation | Vehicles | Right status, per run | Analysed frames/s |
 | --- | --- | :---: | :---: | :---: |
 | **Barrier, day** (Malaysia, 22 s) | two cars stop at a parking barrier; hand-held phone, the view moves a little | 2 | **2 of 2** in every run; one early run added a false extra event (a misread of the same car) | 2.6 to 7.2 |
 | **Night, infrared** (California, 49 s, 720p at 10 fps) | cars arrive and wait 5 to 15 s; plates glow under the IR light | 8 (6 legible, 1 doubtful, 1 never legible) | **4 to 6 of 6** legible plates; sometimes the blurry one is logged twice | 3.5 to 7.7 |
 | **Truck at a plant gate** (promo clip, 7.5 s) | a truck drives up; the plate is small at first, big at the end; edited with zooms | 1 | **1 of 1** in every run | 4.4 to 7.5 |
+| **Entry, day and night** (first-round clip, rerun with the final code) | plate camera facing the entry lane, cars slow down | 5 | **5 of 5** in every run; 4 of 5 plates exact (the fifth, `RN 824`, has its letters stacked and is read `R824`, still logged as unknown, which is its right status); one run added an extra "unread" alert | 6.3 to 7.0 |
 
 Ground truth: `evaluation/ground_truth/live_casos.csv`, read by eye from enlarged crops. The lists are invented (a visit at night arrives outside its hours on purpose, to show the alert). Per-country formats are passed with `--format`, so look-alike characters are fixed by position (California `N LLL NNN`, Malaysia `LLL NNNN`). The clips were trimmed to the part with traffic; the settings above were tuned on these same clips, so they are a demonstration, not a blind test.
 

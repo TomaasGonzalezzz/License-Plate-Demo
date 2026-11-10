@@ -1,157 +1,79 @@
 # License Plate Demo
 ### Lectura de patentes y control de accesos vehiculares
 
-Un sistema pensado para la portería de un barrio o de una planta. Sigue cada vehículo que cruza, lee su patente en varios cuadros y la compara con listas de residentes, visitas y proveedores. Registra cada ingreso y egreso con hora y foto, y en todo momento sabe quién sigue adentro. Funciona sobre video grabado o en vivo, sobre la señal de un grabador de cámaras.
+Un sistema para la portería de un barrio, un edificio o una planta. Lee la patente de cada vehículo que llega, la compara con las listas de residentes, visitas y proveedores, y registra cada ingreso con hora y foto. Avisa al instante si algo no corresponde y sabe en todo momento quién sigue adentro. Funciona en vivo sobre las cámaras que ya existen, con una computadora común.
 
 **Tomás González** · Proyecto individual · noviembre de 2026
 
-[Cómo se evaluó](docs/EVALUATION.md) · [Modo en vivo](docs/LIVE.md) · [Datos y licencias](docs/DATA.md) · [Read in English](README.en.md)
+[Modo en vivo](docs/LIVE.md) · [Evaluación](docs/EVALUATION.md) · [Datos y licencias](docs/DATA.md) · [Read in English](README.en.md)
 
-**Resultado:** en una calle argentina filmada en 4K, detectó los 7 vehículos que cruzaron la portería, sin cruces falsos, y les asignó el estado correcto a los 7. En vivo, en una notebook sin placa de video, registró bien los autos que frenan en una barrera de día y entre 4 y 6 de 6 patentes legibles de noche.
+**Resultado:** con una cámara de patentes frente al carril de ingreso, registró los 5 autos del video con su estado correcto (residente, visita, proveedor o desconocido), de día y de noche, en las tres pruebas que hice en tiempo real. Sobre 147 patentes argentinas, el lector acertó 140.
 
-<img src="demo/demo.gif" alt="Animación: cada vehículo tiene una caja, su patente en grande y un color según su estado; un panel al costado muestra los últimos eventos y quién sigue adentro" width="900">
+<img src="demo/casos/ingreso_dia_noche.gif" alt="Cámara frente al carril de ingreso: cada auto con su patente leída y su estado, y al costado los últimos eventos y quién sigue adentro" width="900">
 
-<sub>Video: Santiago Balbuena, Pexels (licencia Pexels), con anotaciones agregadas. Los nombres de las listas son inventados.</sub>
+<sub>[Video completo](demo/casos/ingreso_dia_noche.mp4) · Video original: [CCTV Camera World / Avalonix, YouTube f2e7deJnfMc](https://www.youtube.com/watch?v=f2e7deJnfMc), con el análisis agregado. Patentes de Estados Unidos; nombres y listas inventados.</sub>
 
 ## Recorrido
 
-```text
- video / RTSP ──► RF-DETR ──► ByteTrack ──► detector de ──► fast-plate-ocr ──► votación entre cuadros
-  (se guarda el   (vehículos  (un ID por    patentes (en    (texto + confianza   (por carácter,
-   4K para la     en 1280 px) vehículo)     el recorte en   por carácter)          pesada por tamaño)
-   patente)                                  4K del auto)                                │
-   annotated.mp4 ◄── registro: quién sigue ◄── línea: entra / sale ◄── listas de acceso ◄┘
-   events.csv          adentro (estado inicial    (cambio de lado,          (validación de formato,
-   recortes/           + ingresos − egresos;       confirmado, estabilizado  comparación tolerante:
-   resumen.txt         avisa salidas sin ingreso)  ante el movimiento)       O/0, I/1, B/8...)
-```
+### 1. Encontrar la patente
 
-### 1. Detectar y seguir cada vehículo
+Un detector de patentes revisa la zona de la barrera en cada cuadro que llega de la cámara. Si no se mueve nada, no analiza, y siempre toma el cuadro más reciente, así nunca se atrasa respecto de lo que pasa en la portería. Cada patente recibe un número propio mientras está en imagen.
 
-[RF-DETR](https://github.com/roboflow/rf-detr) Nano (Apache-2.0, pesos de COCO, en ONNX) busca vehículos en una copia de 1280 px de cada cuadro, y ByteTrack, de [trackers](https://github.com/roboflow/trackers) de Roboflow, le da a cada uno un ID estable. Son los mismos modelos de mi [demo de conteo](https://github.com/TomaasGonzalezzz/Object-Counting-Demo).
+### 2. Leerla varias veces y quedarse con la lectura más segura
 
-### 2. Encontrar y leer la patente
+Mientras el auto se acerca o espera, la patente se lee en muchos cuadros. Cada carácter se decide por votación, y pesan más las lecturas más nítidas y de más cerca. Después se valida el formato (argentino viejo y Mercosur, de auto y de moto, o el de otro país) y se corrigen confusiones típicas, como una `O` leída donde va un `0`. Sobre 147 patentes argentinas recortadas, el lector acertó **140 (95,2 %)**: las 68 Mercosur y 72 de 79 del formato viejo y de moto.
 
-La patente se busca en el recorte del vehículo **en resolución completa**, con el detector de [open-image-models](https://github.com/ankandrew/open-image-models), y se lee con [fast-plate-ocr](https://github.com/ankandrew/fast-plate-ocr). Sobre 147 patentes argentinas recortadas de un set aparte, el lector acierta **140 (95,2 %)**: 68 de 68 Mercosur y 72 de 79 del formato viejo y de moto.
+### 3. Compararla con las listas
 
-### 3. Votar entre cuadros y validar el formato
+La patente se busca en las listas de residentes, visitas (con su horario permitido) y proveedores. La comparación tolera un carácter mal leído, siempre que sea una confusión típica (`O`/`0`, `I`/`1`, `B`/`8`), para no dejar afuera a un residente por una lectura imperfecta.
 
-Cada patente se lee en muchos cuadros. Cada lectura pesa según su confianza al cuadrado y el tamaño de la patente, y las 12 mejores votan carácter por carácter: una lectura nítida de cerca le gana a varias borrosas de lejos. Después se valida el formato (autos `ABC 123` y `AB 123 CD`, motos `123 ABC` y `A 123 BCD`) y se corrigen por posición las confusiones típicas, como una `O` leída donde va un número. Otros países se configuran con `--format "LLL NNNN"`.
+<img src="figures/lecturas.jpg" alt="Siete vehículos de distintos videos: el recorte del auto, el de la patente, la lectura final y el estado que le asignó el sistema" width="900">
 
-### 4. Comparar con las listas
+### 4. Registrar y avisar al instante
 
-La comparación tolera errores: cambiar dos caracteres parecidos (`O`/`0`, `I`/`1`, `B`/`8`) cuesta 0,25 en vez de 1, y hay coincidencia si la distancia total es 1 o menos. Así, una patente con un carácter mal leído igual queda vinculada a la persona correcta. Las visitas que llegan fuera de su horario se marcan como alerta.
+Cada ingreso queda anotado en el momento, con hora, patente, estado y foto de la patente. Si la patente no está en las listas, no se pudo leer o es una visita fuera de su horario, sale como alerta. El sistema lleva la cuenta de quién entró y todavía no salió, y avisa si sale un vehículo que nunca registró su ingreso.
 
-<img src="figures/eventos.jpg" alt="Seis eventos del video: el recorte del vehículo, el de la patente, la lectura final y el estado que le asignó el sistema" width="760">
+### 5. Probarlo en distintas situaciones
 
-### 5. Decidir si entró o salió, y llevar el registro
+Cada video se pasó tres veces en tiempo real, en una notebook sin placa de video (entre 3 y 7 cuadros analizados por segundo), y anoté a mano las patentes de cada uno para comparar:
 
-El sentido sale del lado hacia el que la patente cruza la línea de la portería. Para evitar cruces falsos, el cruce se confirma en dos cuadros y 20 px pasada la línea, y si la caja de un vehículo salta de golpe (dos autos pegados, un acoplado que aparece y desaparece) se empieza de cero. `--stabilize` sigue los pequeños movimientos de la cámara para que la línea quede pegada a la calle. Cada ingreso suma al registro, cada egreso saca la patente más parecida, y el estado final se guarda para la próxima corrida.
-
-### 6. Medirlo contra un conteo hecho a mano
-
-Clip principal: una calle residencial argentina, 4K, cámara fija, 58 s, siete vehículos que cruzan la línea. Leí las patentes a mano en recortes ampliados **antes** de correr el modelo.
-
-| | Resultado |
+| Situación | Resultado |
 | --- | :---: |
-| Cruces de la portería detectados | **7 de 7**, ninguno falso |
-| Estado correcto (residente / visita / proveedor / desconocido / no leída) | **7 de 7** |
-| Patentes legibles leídas exactas | 3 de 5 (30 de 32 caracteres) |
-| Patentes con un carácter errado pero bien vinculadas a la lista | 2 (`GIE 291` por `GEE 291`, `HWE 273` por `HME 273`) |
-| Patentes ilegibles (moto de frente, auto oscuro a contraluz) | 2 de 2 informadas como `no leída`, ninguna inventada |
-| Velocidad (notebook de bajo consumo, i7-10510U, video 4K, 1 de cada 2 cuadros) | 1,1 cuadros/s |
+| Ingreso con cámara de patentes, de día y de noche | 5 de 5 autos con su estado correcto, en las tres pruebas (4 de 5 patentes exactas: la quinta es de dos renglones; en una prueba sumó un aviso de más) |
+| Barrera de estacionamiento, autos que frenan | 2 de 2, en las tres pruebas |
+| Camión llegando al portón de una planta | 1 de 1, en las tres pruebas |
+| Ingreso de noche con cámara infrarroja de baja resolución | 4 a 6 de 6 patentes legibles, según la prueba |
 
-**Es un solo clip con siete vehículos, y las reglas de seguimiento se ajustaron mirándolo.** La primera corrida, sin tocar nada, acertó 3 de 7 estados y ninguna patente completa; cada cambio y su efecto están en [EVALUATION.md](docs/EVALUATION.md).
-
-### 7. Llevarlo a tiempo real
-
-A 1,1 cuadros por segundo sirve para video grabado, no para una portería. El modo `--live` saca el detector de vehículos y busca la patente directamente en una zona cerca de la barrera; si no se mueve nada, no analiza, y siempre toma el cuadro más nuevo, descartando los que no llega a procesar, como pasa con una cámara. Cada evento se escribe en el momento.
-
-Lo probé con videos públicos de porterías y barreras, pasando cada uno tres veces a su velocidad real en la misma notebook. Los resultados cambian entre corridas según qué cuadros alcanza a tomar, así que doy el rango:
-
-| Video | Estado correcto | Cuadros analizados por segundo |
-| --- | :---: | :---: |
-| Barrera de estacionamiento, de día (los autos frenan) | 2 de 2 en todas las corridas | 2,6 a 7,2 |
-| Noche con infrarrojo, autos esperando en el portón | 4 a 6 de 6 patentes legibles | 3,5 a 7,7 |
-| Camión llegando al portón de una planta | 1 de 1 en todas las corridas | 4,4 a 7,5 |
-| Calle argentina en 1080p (cámara general, patentes chicas) | 0 a 2 de 5 patentes legibles | 3,3 a 5,6 |
-
-Con una cámara ubicada para leer patentes y autos que frenan, funciona en tiempo real en una notebook, con alguna pérdida ocasional de noche. Una cámara general de calle no alcanza. Comandos, cambios y qué no ve: [docs/LIVE.md](docs/LIVE.md).
-
-Así se ve lo que el sistema muestra en vivo en cada caso, con las listas inventadas (los videos se grabaron durante la corrida en tiempo real, con lo que el sistema sabía en cada momento):
-
-**Barrera de día.** Dos autos frenan frente a la barrera: uno queda como residente y el otro como visita autorizada en su horario.
+**Barrera de día.** Dos autos frenan frente a la barrera: uno es residente y el otro, una visita autorizada en su horario.
 
 <img src="demo/casos/barrera_dia.gif" alt="Auto frenado en una barrera con su patente leída y su estado, y el panel de ingresos y de quién sigue adentro" width="760">
 
-<sub>[Video completo](demo/casos/barrera_dia.mp4) · Video original: [YouTube, oJ1sAD7IoNs](https://www.youtube.com/watch?v=oJ1sAD7IoNs) (tramo 0:48 a 1:10), con el análisis agregado. Patentes de Malasia.</sub>
-
-**Ingreso de noche con infrarrojo.** Autos que llegan y esperan en el portón. Una visita que llega fuera de su horario sale como alerta.
-
-<img src="demo/casos/noche_infrarrojo.gif" alt="Imagen nocturna en blanco y negro: autos detenidos con su patente leída y su estado, y el panel de eventos" width="760">
-
-<sub>[Video completo](demo/casos/noche_infrarrojo.mp4) · Video original: [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo) (tramo 1:43 a 2:32), con el análisis agregado. Patentes de Estados Unidos.</sub>
+<sub>[Video completo](demo/casos/barrera_dia.mp4) · Video original: [YouTube oJ1sAD7IoNs](https://www.youtube.com/watch?v=oJ1sAD7IoNs) (0:48 a 1:10), con el análisis agregado. Patentes de Malasia.</sub>
 
 **Camión en el portón de una planta.** Espera a tener una lectura firme y lo registra como proveedor con turno.
 
 <img src="demo/casos/camion_porton.gif" alt="Camión frente al portón de una planta, con su patente leída y marcado como proveedor" width="760">
 
-<sub>[Video completo](demo/casos/camion_porton.mp4) · Video original: [YouTube, xSYAfvnfUg4](https://www.youtube.com/watch?v=xSYAfvnfUg4) (primeros 7 segundos), con el análisis agregado.</sub>
+<sub>[Video completo](demo/casos/camion_porton.mp4) · Video original: [YouTube xSYAfvnfUg4](https://www.youtube.com/watch?v=xSYAfvnfUg4) (primeros 7 segundos), con el análisis agregado.</sub>
+
+**Ingreso de noche con infrarrojo.** El caso más difícil: video de baja resolución y patentes encandiladas por la luz infrarroja. Una visita que llega fuera de su horario sale como alerta.
+
+<img src="demo/casos/noche_infrarrojo.gif" alt="Imagen nocturna en blanco y negro: autos detenidos con su patente leída y su estado, y el panel de eventos" width="760">
+
+<sub>[Video completo](demo/casos/noche_infrarrojo.mp4) · Video original: [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo) (1:43 a 2:32), con el análisis agregado. Patentes de Estados Unidos.</sub>
+
+### 6. Medirlo con una calle argentina
+
+Además del modo en vivo, el sistema tiene una versión para video grabado que también sigue a cada vehículo, aunque no se le vea la patente. En un video de 58 segundos de una calle argentina filmada en 4K, anoté las patentes a mano antes de correrlo: detectó los 7 vehículos que pasaron, sin falsos, y asignó bien el estado de los 7. Las dos patentes que no se podían leer (una moto de frente y un auto a contraluz) quedaron como "no leída", sin inventar nada. El detalle está en [EVALUATION.md](docs/EVALUATION.md).
 
 ## Conclusión
 
-El sistema funciona de punta a punta con patentes argentinas reales y en tiempo real en una computadora común. Lo que más pesa en el resultado no es el modelo sino la cámara: con patentes de más de 80 px y un auto que frena, las lecturas son firmes; con patentes chicas o de noche con poca resolución, aparecen las pérdidas. Antes de prometer un número en una instalación real, hay que medirlo con la cámara del lugar.
+El sistema funciona de punta a punta y en tiempo real en una computadora común. Lo que más pesa en el resultado no es el modelo sino la cámara: con una cámara ubicada para leer patentes y un auto que frena en la barrera, las lecturas son firmes; con patentes chicas, o de noche con poca resolución, aparecen pérdidas. Por eso, en una instalación real, lo primero es revisar la ubicación de la cámara y medir con sus propias imágenes.
 
-## Cómo correrlo
+## Límites y cuidados
 
-Windows, macOS o Linux, Python 3.11 o más nuevo, unos 400 MB de dependencias (sin PyTorch).
+- **Pocos videos de prueba.** Los resultados muestran que el sistema funciona, pero el número real hay que medirlo con la cámara de cada lugar.
+- **Un vehículo sin patente legible** no genera evento en el modo en vivo. Un sensor de presencia en la barrera o el detector de vehículos cada tantos cuadros lo cubren.
+- **Datos personales.** Una patente asociable a una persona es un dato personal (Ley 25.326). Una instalación real necesita cartel de zona videovigilada, retención corta de los registros y acceso restringido. No usa reconocimiento facial.
 
-```sh
-git clone https://github.com/TomaasGonzalezzz/License-Plate-Demo && cd License-Plate-Demo
-uv sync                      # o: python -m venv .venv && .venv\Scripts\pip install -e .
-curl -L -o pexels-38118760.mp4 https://www.pexels.com/download/video/38118760/
-
-# video grabado, con la línea de la portería
-uv run python -m platedemo pexels-38118760.mp4 --line 0,480,1280,480 --flip --stabilize \
-  --lists data/listas --inside data/listas/estado_inicial.csv --clock 10:15:00 --out out
-
-# en vivo, sobre un grabador: un evento cuando la patente se lee dentro de la zona de la barrera
-uv run python -m platedemo "rtsp://usuario:clave@192.168.0.20:554/..." --live --trigger zona --lane entra \
-  --read-zone 100,250,1200,640 --lists data/listas_entrada --show --out out
-
-uv run pytest -q
-```
-
-Los pesos de los modelos (unos 40 MB) se descargan en la primera corrida. `--device dml` usa cualquier placa de video DirectX 12 en Windows a través de ONNX Runtime DirectML y vuelve a la CPU si falla. Para comparar una corrida con la verdad de referencia: `uv run python -m platedemo.evaluate events out/events.csv evaluation/ground_truth/porteria_pexels.csv --lists data/listas`.
-
-| Salida | Contenido |
-| --- | --- |
-| `annotated.mp4` / `live.mp4` | Cajas, la patente en grande con el color de su estado, la línea o la zona, los últimos eventos y quién sigue adentro |
-| `events.csv` | hora, ID, patente, confianza, estado, sentido, nombre en la lista, nota, cantidad de lecturas, recortes |
-| `alertas.csv` | desconocidos, no leídas, visitas fuera de horario y salidas sin ingreso (modo en vivo) |
-| `recortes/` | el mejor recorte de patente (y de vehículo) por evento |
-| `resumen.txt`, `estado_final.csv` | resumen al cierre y quién sigue adentro, para usar como `--inside` la próxima vez |
-
-## Limitaciones
-
-- **Pocos videos, ajustados sobre ellos.** Los números muestran que el sistema funciona; no son una tasa de acierto general.
-- **El tamaño de la patente decide casi todo.** Por debajo de unos 80 px de ancho, los errores suben rápido. Una cámara dedicada a patentes (de frente, a 3 a 8 m, con infrarrojo de noche) pesa más que cualquier cambio de modelo.
-- **Lo que el modo en vivo no ve:** un vehículo sin patente legible no genera evento, porque no hay patente para seguir. Correr el detector de vehículos cada tantos cuadros, o un sensor de presencia en la barrera, lo resolvería.
-- **Los pesos del detector de patentes no declaran licencia** (ver [DATA.md](docs/DATA.md)). El código es MIT; hay que confirmarlos o reentrenar antes de cualquier uso comercial.
-- **Datos personales.** Una patente asociable a una persona es un dato personal (Ley 25.326). Una instalación real necesita cartel de zona videovigilada, retención corta y acceso restringido. No se usa reconocimiento facial ni hace falta.
-
-## Estructura
-
-```text
-src/platedemo/     formatos, comparación con listas, votación, línea y registro, estabilización,
-                   modelos, pipeline grabado, modo en vivo, dibujo, video, evaluación, línea de comandos
-data/              listas inventadas y estados iniciales (una carpeta por video de prueba)
-evaluation/        verdad de referencia hecha a mano y configuración de cada video
-results/           salidas guardadas de la corrida final sobre el video grabado
-demo/              demo.mp4 y demo.gif
-figures/           imágenes del README
-docs/              EVALUATION.md, LIVE.md y DATA.md (en inglés)
-tests/             formatos, comparación tolerante, votación, entradas y salidas, estabilización, seguimiento en vivo
-```
-
-Licencia MIT. Los videos y los datasets no están incluidos en el repositorio; las fuentes y sus licencias están en [docs/DATA.md](docs/DATA.md).
+Licencia MIT. Los pesos del detector de patentes no declaran licencia: hay que confirmarlos o reentrenarlos antes de un uso comercial ([DATA.md](docs/DATA.md)). La calle argentina es el video 38118760 de Santiago Balbuena en Pexels (licencia Pexels).
