@@ -1,0 +1,12 @@
+clip,segundo_aprox,patente,legible,nota
+barrera_dia,3,WND1288,si,"Malasia; auto que llega y frena frente a la barrera"
+barrera_dia,15,WMJ8663,si,"Malasia; el mismo auto que se ve de atrás al principio del video original vuelve y frena"
+noche_ir,1,7VEH087,si,"EE.UU. (California); infrarrojo, 10 cuadros por segundo"
+noche_ir,5,7TKX957,si,"queda detenido unos 10 s; la patente sale muy iluminada por el infrarrojo"
+noche_ir,17,4MOD377,si,"queda detenido unos 14 s"
+noche_ir,33,6FVG836,dudosa,"recorte borroso; se lee 6FVG836 o parecido"
+noche_ir,36,7DUX432,si,
+noche_ir,41,,no,"auto chico abajo a la derecha, de costado; la patente no se llega a leer a ojo"
+noche_ir,43,6XVA709,si,
+noche_ir,45,7HJP626,si,
+camion_porton,6,WRP3975,si,"camión llegando al portón de una planta; video promocional con zoom (sin detección de cortes: --cut-threshold 0)"

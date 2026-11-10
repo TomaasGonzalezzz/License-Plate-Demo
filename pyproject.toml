@@ -1,0 +1,31 @@
+[project]
+name = "platedemo"
+version = "0.1.0"
+description = "Read license plates of vehicles crossing a gate in a video (RF-DETR + ByteTrack + plate detector + OCR with multi-frame voting), check them against access lists and keep a register of who is inside."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+    "fast-plate-ocr>=1.1.0",
+    "open-image-models>=0.6.0",
+    "trackers>=2.7.0",
+    "supervision>=0.31.5",
+    "opencv-python>=4.10",
+    "numpy>=2.0",
+    "pillow>=10.0",
+    "imageio-ffmpeg>=0.5",
+    # ONNX Runtime: the DirectML build on Windows (CPU + any DirectX 12 GPU), the plain CPU build elsewhere.
+    "onnxruntime-directml>=1.19; sys_platform == 'win32'",
+    "onnxruntime>=1.19; sys_platform != 'win32'",
+]
+
+[project.scripts]
+platedemo = "platedemo.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+tools = ["yt-dlp>=2025.1.1"]

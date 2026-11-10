@@ -1,0 +1,43 @@
+{
+  "ingresos": 0,
+  "egresos": 7,
+  "por_estado": {
+    "no leída": 2,
+    "proveedor": 2,
+    "desconocido": 1,
+    "visita": 1,
+    "residente": 1
+  },
+  "desconocidos": [
+    "AG 145 PE"
+  ],
+  "no_leidas": 2,
+  "siguen_adentro": [
+    {
+      "patente": "AD 457 KR",
+      "estado": "residente",
+      "desde": "07:15:20",
+      "nombre": "Lote 3",
+      "de_antes": true
+    },
+    {
+      "patente": "AF 902 ST",
+      "estado": "residente",
+      "desde": "09:48:30",
+      "nombre": "Lote 22",
+      "de_antes": true
+    },
+    {
+      "patente": "KJT 552",
+      "estado": "visita",
+      "desde": "10:05:10",
+      "nombre": "Visita lote 22",
+      "de_antes": true
+    }
+  ],
+  "salidas_sin_ingreso": [
+    "#5",
+    "AG 145 PE",
+    "#9"
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "config": {
+    "line": "0,480,1280,480",
+    "flip": true,
+    "lists": "data\\listas",
+    "inside": "data\\listas\\estado_inicial.csv",
+    "formats": "ar",
+    "clock": "10:15:00",
+    "device": "cpu",
+    "vehicle_model": "rf-detr-nano-384-coco",
+    "vehicle_threshold": 0.45,
+    "plate_model": "yolo-v9-t-640-license-plate-end2end",
+    "plate_threshold": 0.3,
+    "ocr_model": "cct-s-v2-global-model",
+    "min_vehicle_width": 90.0,
+    "read_zone": null,
+    "plate_margin": 0.06,
+    "min_plate_width": 60.0,
+    "max_readings": 60,
+    "stop_after_agree": 6,
+    "stop_width": 100.0,
+    "top_k": 12,
+    "min_readings": 2,
+    "min_confidence": 0.45,
+    "match_distance": 1.0,
+    "stabilize": true,
+    "margin": 6.0,
+    "extend": 40.0,
+    "confirm": 2,
+    "confirm_distance": 20.0,
+    "jump_factor": 0.5,
+    "area_jump": 1.6,
+    "finalize_seconds": 2.5,
+    "track_activation_threshold": 0.5,
+    "lost_track_buffer": 30,
+    "minimum_consecutive_frames": 2,
+    "minimum_iou_threshold": 0.1,
+    "start": 0,
+    "end": null,
+    "stride": 2,
+    "max_width": 1280,
+    "write_video": true,
+    "h264": true,
+    "title": "Porter\u00eda (demo)",
+    "credit": "Video: Santiago Balbuena, Pexels (licencia Pexels)"
+  },
+  "source": {
+    "width": 3840,
+    "height": 2160,
+    "fps": 23.976023976023978
+  },
+  "frames_processed": 701,
+  "wall_seconds": 627.0,
+  "processed_frames_per_second": 1.12,
+  "video_seconds_per_wall_second": 0.093,
+  "ms_per_frame": {
+    "vehiculos": 411.6,
+    "patentes": 254.6,
+    "ocr": 34.9,
+    "dibujo": 87.9,
+    "estabilizacion": 50.4
+  },
+  "stabilizer_frames": {
+    "estabilizacion_ok": 700,
+    "estabilizacion_fallida": 0
+  },
+  "providers": {
+    "vehiculos": [
+      "CPUExecutionProvider"
+    ],
+    "patentes": [
+      "CPUExecutionProvider"
+    ]
+  },
+  "events": 7
+}

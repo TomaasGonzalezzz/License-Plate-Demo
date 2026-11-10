@@ -1,0 +1,41 @@
+{
+  "cct-s-v2-global-model": {
+    "total": 147,
+    "exactas": 140,
+    "exactas_con_correccion": 140,
+    "mercosur": [
+      68,
+      68
+    ],
+    "viejas": [
+      72,
+      79
+    ]
+  },
+  "argentinian-plates-cnn-synth-model": {
+    "total": 147,
+    "exactas": 140,
+    "exactas_con_correccion": 140,
+    "mercosur": [
+      68,
+      68
+    ],
+    "viejas": [
+      72,
+      79
+    ]
+  },
+  "global-plates-mobile-vit-v2-model": {
+    "total": 147,
+    "exactas": 134,
+    "exactas_con_correccion": 134,
+    "mercosur": [
+      67,
+      68
+    ],
+    "viejas": [
+      67,
+      79
+    ]
+  }
+}

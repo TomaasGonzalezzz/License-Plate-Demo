@@ -1,0 +1,91 @@
+{
+  "cruces_reales": 7,
+  "cruces_detectados": 7,
+  "cruces_falsos": 0,
+  "patentes_legibles": 5,
+  "patentes_leidas_exactas": 3,
+  "caracteres_ok": 30,
+  "caracteres_total": 32,
+  "estados_correctos": 7,
+  "detalle": [
+    {
+      "vehiculo": "moto",
+      "patente_real": "(ilegible)",
+      "detectado": true,
+      "patente_leida": "",
+      "estado": "no leída",
+      "estado_esperado": "no leída",
+      "estado_correcto": true
+    },
+    {
+      "vehiculo": "blindado_1",
+      "patente_real": "AG279?C",
+      "detectado": true,
+      "patente_leida": "AG 279 XC",
+      "estado": "proveedor",
+      "estado_esperado": "proveedor",
+      "lectura_correcta": true,
+      "caracteres_ok": 6,
+      "caracteres": 6,
+      "estado_correcto": true
+    },
+    {
+      "vehiculo": "blindado_2",
+      "patente_real": "AG145PE",
+      "detectado": true,
+      "patente_leida": "AG 145 PE",
+      "estado": "desconocido",
+      "estado_esperado": "desconocido",
+      "lectura_correcta": true,
+      "caracteres_ok": 7,
+      "caracteres": 7,
+      "estado_correcto": true
+    },
+    {
+      "vehiculo": "fiat_palio",
+      "patente_real": "HME273",
+      "detectado": true,
+      "patente_leida": "HWE 273",
+      "estado": "visita",
+      "estado_esperado": "visita",
+      "lectura_correcta": false,
+      "caracteres_ok": 5,
+      "caracteres": 6,
+      "estado_correcto": true
+    },
+    {
+      "vehiculo": "mercedes_negro",
+      "patente_real": "(ilegible)",
+      "detectado": true,
+      "patente_leida": "",
+      "estado": "no leída",
+      "estado_esperado": "no leída",
+      "estado_correcto": true
+    },
+    {
+      "vehiculo": "scania",
+      "patente_real": "GEE291",
+      "detectado": true,
+      "patente_leida": "GIE 291",
+      "estado": "proveedor",
+      "estado_esperado": "proveedor",
+      "lectura_correcta": false,
+      "caracteres_ok": 5,
+      "caracteres": 6,
+      "estado_correcto": true
+    },
+    {
+      "vehiculo": "ford_ka",
+      "patente_real": "AC611JO",
+      "detectado": true,
+      "patente_leida": "AC 611 JO",
+      "estado": "residente",
+      "estado_esperado": "residente",
+      "lectura_correcta": true,
+      "caracteres_ok": 7,
+      "caracteres": 7,
+      "estado_correcto": true
+    }
+  ],
+  "eventos_sin_vehiculo_real": []
+}

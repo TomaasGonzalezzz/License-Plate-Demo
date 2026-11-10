@@ -1,0 +1,8 @@
+vehiculo,desde_s,hasta_s,sentido,patente,legible,nota
+moto,10.5,13.5,sale,,no,Moto de frente: en Argentina las motos solo llevan patente trasera
+blindado_1,23.0,26.5,sale,AG279?C,parcial,Patente Mercosur a unos 100-150 px; el sexto carácter (X o N) no se distingue ni a ojo
+blindado_2,26.0,29.5,sale,AG145PE,si,Patente Mercosur a unos 100-150 px
+fiat_palio,29.5,32.0,sale,HME273,si,Formato viejo; se lee claro en pocos cuadros antes de que el auto gire
+mercedes_negro,33.5,37.5,sale,,no,Auto oscuro a contraluz; la patente no se puede leer ni a ojo
+scania,37.5,48.0,sale,GEE291,si,Formato viejo; un tornillo tapa parte del espacio entre letras y números. Ventana corregida después de la corrida (antes 42-48 s): el camión estaba estacionado a 20 px de la línea y la cruza apenas arranca (38 s); es el mismo vehículo (id 1)
+ford_ka,53.5,58.4,sale,AC611JO,si,Patente Mercosur; se lee clara entre los 54 y 56 s

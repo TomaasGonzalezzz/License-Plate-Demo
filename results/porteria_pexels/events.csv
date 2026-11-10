@@ -1,0 +1,8 @@
+hora,segundo_video,id,patente,confianza,estado,sentido,nombre,nota,lecturas,recorte_patente,recorte_vehiculo
+10:15:11,11.01,5,,,no leída,sale,,no se encontró la patente,0,,
+10:15:22,22.77,2,AG 279 XC,0.80,proveedor,sale,Transporte de caudales,,12,recortes/evento_02_AG279XC_patente.jpg,recortes/evento_02_AG279XC_vehiculo.jpg
+10:15:26,26.53,6,AG 145 PE,0.91,desconocido,sale,,salida sin ingreso registrado,12,recortes/evento_03_AG145PE_patente.jpg,recortes/evento_03_AG145PE_vehiculo.jpg
+10:15:29,29.11,7,HWE 273,0.60,visita,sale,Visita lote 8,coincide con HME273 (distancia 1),12,recortes/evento_04_HWE273_patente.jpg,recortes/evento_04_HWE273_vehiculo.jpg
+10:15:34,34.62,9,,,no leída,sale,,mejor intento: PTE111 (0.31),8,recortes/evento_05_sin_lectura_patente.jpg,recortes/evento_05_sin_lectura_vehiculo.jpg
+10:15:37,37.95,1,GIE 291,0.83,proveedor,sale,Fletes (obra lote 32),coincide con GEE291 (distancia 1),12,recortes/evento_06_GIE291_patente.jpg,recortes/evento_06_GIE291_vehiculo.jpg
+10:15:54,54.05,13,AC 611 JO,1.00,residente,sale,Lote 14,,12,recortes/evento_07_AC611JO_patente.jpg,recortes/evento_07_AC611JO_vehiculo.jpg

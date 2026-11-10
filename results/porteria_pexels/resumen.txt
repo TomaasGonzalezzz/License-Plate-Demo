@@ -1,0 +1,14 @@
+Resumen al cierre
+=================
+Ingresos: 0
+Egresos: 7
+Por estado: no leída 2, proveedor 2, desconocido 1, visita 1, residente 1
+Desconocidos: AG 145 PE
+Sin patente leída: 2
+
+Siguen adentro (3):
+  AD 457 KR  residente    desde 07:15:20  (ingresó antes del video)
+  AF 902 ST  residente    desde 09:48:30  (ingresó antes del video)
+  KJT 552    visita       desde 10:05:10  (ingresó antes del video)
+
+Salidas sin ingreso registrado: #5, AG 145 PE, #9

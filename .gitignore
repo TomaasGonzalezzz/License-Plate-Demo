@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+out/
+runs/
+*.egg-info/
+# videos and datasets live outside the repo (see docs/DATA.md)
+*.mp4
+!demo/demo.mp4
+*.zip
+
+# solo en esta PC (guías de estudio, notas)
+local/

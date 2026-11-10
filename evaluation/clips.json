@@ -1,0 +1,14 @@
+{
+  "porteria_pexels": {
+    "file": "pexels-38118760.mp4",
+    "source": "https://www.pexels.com/video/scenic-urban-neighborhood-with-cargo-trucks-38118760/",
+    "line": "560,440,1280,440",
+    "flip": true,
+    "clock": "10:15:00",
+    "lists": "data/listas",
+    "inside": "data/listas/estado_inicial.csv",
+    "stride": 2,
+    "ground_truth": "evaluation/ground_truth/porteria_pexels.csv",
+    "note": "Calle residencial argentina, cámara fija en trípode, 4K. Todos los vehículos vienen hacia la cámara: en la demo se toma como el carril de salida de un barrio (--flip)."
+  }
+}
