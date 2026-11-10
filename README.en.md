@@ -103,6 +103,16 @@ A second round used clips where vehicles stop in front of the camera, as at a ga
 
 With a camera placed for plates it works in real time on a laptop, with occasional misses (mostly at night); a general street camera is not enough. Details, commands and what it does not see: [docs/LIVE.md](docs/LIVE.md).
 
+What the live mode showed in each second-round case, recorded during the real-time run (invented lists):
+
+| Case | Preview | Full video | Original video |
+| --- | --- | --- | --- |
+| Parking barrier, day | [GIF](demo/casos/barrera_dia.gif) | [MP4](demo/casos/barrera_dia.mp4) | [YouTube oJ1sAD7IoNs](https://www.youtube.com/watch?v=oJ1sAD7IoNs), 0:48 to 1:10 |
+| Night, infrared | [GIF](demo/casos/noche_infrarrojo.gif) | [MP4](demo/casos/noche_infrarrojo.mp4) | [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo), 1:43 to 2:32 |
+| Truck at a plant gate | [GIF](demo/casos/camion_porton.gif) | [MP4](demo/casos/camion_porton.mp4) | [YouTube xSYAfvnfUg4](https://www.youtube.com/watch?v=xSYAfvnfUg4), first 7 s |
+
+<img src="demo/casos/barrera_dia.gif" alt="A car stopped at a barrier with its plate read and its status, and the panel of entries and who is still inside" width="760">
+
 ## Limitations
 
 - **One clip, seven vehicles, tuned on it.** The numbers show the pipeline works end to end on real Argentine plates; they are not an accuracy rate. Before promising a number to anyone, it has to be measured on their camera.

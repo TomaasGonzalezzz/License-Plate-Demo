@@ -12,3 +12,4 @@ runs/
 
 # solo en esta PC (guías de estudio, notas)
 local/
+!demo/casos/*.mp4

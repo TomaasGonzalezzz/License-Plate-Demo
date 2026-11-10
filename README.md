@@ -78,6 +78,26 @@ Lo probé con videos públicos de porterías y barreras, pasando cada uno tres v
 
 Con una cámara ubicada para leer patentes y autos que frenan, funciona en tiempo real en una notebook, con alguna pérdida ocasional de noche. Una cámara general de calle no alcanza. Comandos, cambios y qué no ve: [docs/LIVE.md](docs/LIVE.md).
 
+Así se ve lo que el sistema muestra en vivo en cada caso, con las listas inventadas (los videos se grabaron durante la corrida en tiempo real, con lo que el sistema sabía en cada momento):
+
+**Barrera de día.** Dos autos frenan frente a la barrera: uno queda como residente y el otro como visita autorizada en su horario.
+
+<img src="demo/casos/barrera_dia.gif" alt="Auto frenado en una barrera con su patente leída y su estado, y el panel de ingresos y de quién sigue adentro" width="760">
+
+<sub>[Video completo](demo/casos/barrera_dia.mp4) · Video original: [YouTube, oJ1sAD7IoNs](https://www.youtube.com/watch?v=oJ1sAD7IoNs) (tramo 0:48 a 1:10), con el análisis agregado. Patentes de Malasia.</sub>
+
+**Ingreso de noche con infrarrojo.** Autos que llegan y esperan en el portón. Una visita que llega fuera de su horario sale como alerta.
+
+<img src="demo/casos/noche_infrarrojo.gif" alt="Imagen nocturna en blanco y negro: autos detenidos con su patente leída y su estado, y el panel de eventos" width="760">
+
+<sub>[Video completo](demo/casos/noche_infrarrojo.mp4) · Video original: [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo) (tramo 1:43 a 2:32), con el análisis agregado. Patentes de Estados Unidos.</sub>
+
+**Camión en el portón de una planta.** Espera a tener una lectura firme y lo registra como proveedor con turno.
+
+<img src="demo/casos/camion_porton.gif" alt="Camión frente al portón de una planta, con su patente leída y marcado como proveedor" width="760">
+
+<sub>[Video completo](demo/casos/camion_porton.mp4) · Video original: [YouTube, xSYAfvnfUg4](https://www.youtube.com/watch?v=xSYAfvnfUg4) (primeros 7 segundos), con el análisis agregado.</sub>
+
 ## Conclusión
 
 El sistema funciona de punta a punta con patentes argentinas reales y en tiempo real en una computadora común. Lo que más pesa en el resultado no es el modelo sino la cámara: con patentes de más de 80 px y un auto que frena, las lecturas son firmes; con patentes chicas o de noche con poca resolución, aparecen las pérdidas. Antes de prometer un número en una instalación real, hay que medirlo con la cámara del lugar.
