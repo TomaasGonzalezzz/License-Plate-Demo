@@ -9,9 +9,9 @@ Un sistema para la portería de un barrio, un edificio o una planta. Lee la pate
 
 **Resultado:** con una cámara de patentes frente al carril de ingreso, registró los 5 autos del video con su estado correcto (residente, visita, proveedor o desconocido), de día y de noche, en las tres pruebas que hice en tiempo real. Sobre 147 patentes argentinas, el lector acertó 140.
 
-<img src="demo/casos/ingreso_dia_noche.gif" alt="Cámara frente al carril de ingreso: cada auto con su patente leída y su estado, y al costado los últimos eventos y quién sigue adentro" width="900">
+<img src="demo/casos/calle_argentina.gif" alt="Calle de barrio argentina en vivo: un auto con patente Mercosur AC 611 JO leída y marcada como residente que sale, y al costado el panel de eventos y de quién sigue adentro" width="680">
 
-<sub>[Video completo](demo/casos/ingreso_dia_noche.mp4) · Video original: [CCTV Camera World / Avalonix, YouTube f2e7deJnfMc](https://www.youtube.com/watch?v=f2e7deJnfMc), con el análisis agregado. Patentes de Estados Unidos; nombres y listas inventados.</sub>
+<sub>Calle de barrio argentina, en vivo: lee la patente Mercosur AC 611 JO, la encuentra en la lista de residentes y registra que sale. [Video completo](demo/casos/calle_argentina.mp4) · Video original: Santiago Balbuena, Pexels 38118760 (licencia Pexels), con el análisis agregado. Listas inventadas.</sub>
 
 ## Recorrido
 
@@ -27,7 +27,7 @@ Mientras el auto se acerca o espera, la patente se lee en muchos cuadros. Cada c
 
 La patente se busca en las listas de residentes, visitas (con su horario permitido) y proveedores. La comparación tolera un carácter mal leído, siempre que sea una confusión típica (`O`/`0`, `I`/`1`, `B`/`8`), para no dejar afuera a un residente por una lectura imperfecta.
 
-<img src="figures/lecturas.jpg" alt="Siete vehículos de distintos videos: el recorte del auto, el de la patente, la lectura final y el estado que le asignó el sistema" width="900">
+<img src="figures/lecturas.jpg" alt="Siete vehículos de distintos videos: el recorte del auto, el de la patente, la lectura final y el estado que le asignó el sistema" width="720">
 
 ### 4. Registrar y avisar al instante
 
@@ -44,21 +44,27 @@ Cada video se pasó tres veces en tiempo real, en una notebook sin placa de vide
 | Camión llegando al portón de una planta | 1 de 1, en las tres pruebas |
 | Ingreso de noche con cámara infrarroja de baja resolución | 4 a 6 de 6 patentes legibles, según la prueba |
 
+**Ingreso con cámara de patentes, de día y de noche.** El caso más parecido a la entrada de un barrio: los autos llegan despacio frente a una cámara pensada para leer patentes.
+
+<img src="demo/casos/ingreso_dia_noche.gif" alt="Cámara frente al carril de ingreso: cada auto con su patente leída y su estado, y al costado los últimos eventos y quién sigue adentro" width="640">
+
+<sub>[Video completo](demo/casos/ingreso_dia_noche.mp4) · Video original: [CCTV Camera World / Avalonix, YouTube f2e7deJnfMc](https://www.youtube.com/watch?v=f2e7deJnfMc), con el análisis agregado. Patentes de Estados Unidos; nombres y listas inventados.</sub>
+
 **Barrera de día.** Dos autos frenan frente a la barrera: uno es residente y el otro, una visita autorizada en su horario.
 
-<img src="demo/casos/barrera_dia.gif" alt="Auto frenado en una barrera con su patente leída y su estado, y el panel de ingresos y de quién sigue adentro" width="760">
+<img src="demo/casos/barrera_dia.gif" alt="Auto frenado en una barrera con su patente leída y su estado, y el panel de ingresos y de quién sigue adentro" width="640">
 
 <sub>[Video completo](demo/casos/barrera_dia.mp4) · Video original: [YouTube oJ1sAD7IoNs](https://www.youtube.com/watch?v=oJ1sAD7IoNs) (0:48 a 1:10), con el análisis agregado. Patentes de Malasia.</sub>
 
 **Camión en el portón de una planta.** Espera a tener una lectura firme y lo registra como proveedor con turno.
 
-<img src="demo/casos/camion_porton.gif" alt="Camión frente al portón de una planta, con su patente leída y marcado como proveedor" width="760">
+<img src="demo/casos/camion_porton.gif" alt="Camión frente al portón de una planta, con su patente leída y marcado como proveedor" width="640">
 
 <sub>[Video completo](demo/casos/camion_porton.mp4) · Video original: [YouTube xSYAfvnfUg4](https://www.youtube.com/watch?v=xSYAfvnfUg4) (primeros 7 segundos), con el análisis agregado.</sub>
 
 **Ingreso de noche con infrarrojo.** El caso más difícil: video de baja resolución y patentes encandiladas por la luz infrarroja. Una visita que llega fuera de su horario sale como alerta.
 
-<img src="demo/casos/noche_infrarrojo.gif" alt="Imagen nocturna en blanco y negro: autos detenidos con su patente leída y su estado, y el panel de eventos" width="760">
+<img src="demo/casos/noche_infrarrojo.gif" alt="Imagen nocturna en blanco y negro: autos detenidos con su patente leída y su estado, y el panel de eventos" width="640">
 
 <sub>[Video completo](demo/casos/noche_infrarrojo.mp4) · Video original: [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo) (1:43 a 2:32), con el análisis agregado. Patentes de Estados Unidos.</sub>
 

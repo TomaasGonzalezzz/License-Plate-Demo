@@ -9,9 +9,9 @@ A system for the gate of a gated community, a building or a plant. It reads the 
 
 **Result:** with a plate camera facing the entry lane, it logged all 5 cars in the video with the right status (resident, visitor, supplier or unknown), day and night, in all three real-time runs. On 147 Argentine plates, the reader got 140 right.
 
-<img src="demo/casos/ingreso_dia_noche.gif" alt="Camera facing the entry lane: each car with its plate read and its status, and on the side the latest events and who is still inside" width="900">
+<img src="demo/casos/calle_argentina.gif" alt="Argentine residential street, live: a car with Mercosur plate AC 611 JO read and marked as a resident leaving, with the events panel and who is still inside" width="680">
 
-<sub>[Full video](demo/casos/ingreso_dia_noche.mp4) · Original video: [CCTV Camera World / Avalonix, YouTube f2e7deJnfMc](https://www.youtube.com/watch?v=f2e7deJnfMc), analysis overlay added. US plates; names and lists are invented.</sub>
+<sub>Argentine residential street, live: it reads the Mercosur plate AC 611 JO, finds it on the residents list and logs it leaving. [Full video](demo/casos/calle_argentina.mp4) · Original video: Santiago Balbuena, Pexels 38118760 (Pexels license), analysis overlay added. Lists are made up.</sub>
 
 ## How it was built
 
@@ -27,7 +27,7 @@ While the car approaches or waits, the plate is read in many frames. Each charac
 
 The plate is looked up in the lists of residents, visitors (with their allowed hours) and suppliers. The match tolerates one misread character when it is a typical confusion (`O`/`0`, `I`/`1`, `B`/`8`), so a resident is not turned away by an imperfect reading.
 
-<img src="figures/lecturas.jpg" alt="Seven vehicles from different videos: the vehicle crop, the plate crop, the final reading and the status the system assigned" width="900">
+<img src="figures/lecturas.jpg" alt="Seven vehicles from different videos: the vehicle crop, the plate crop, the final reading and the status the system assigned" width="720">
 
 ### 4. Log and alert instantly
 
@@ -46,6 +46,7 @@ Each video was played three times in real time on a laptop without a GPU (3 to 7
 
 | Case | Preview | Full video | Original video |
 | --- | --- | --- | --- |
+| Entry with a plate camera, day and night | [GIF](demo/casos/ingreso_dia_noche.gif) | [MP4](demo/casos/ingreso_dia_noche.mp4) | [CCTV Camera World / Avalonix, YouTube f2e7deJnfMc](https://www.youtube.com/watch?v=f2e7deJnfMc) |
 | Parking barrier, day | [GIF](demo/casos/barrera_dia.gif) | [MP4](demo/casos/barrera_dia.mp4) | [YouTube oJ1sAD7IoNs](https://www.youtube.com/watch?v=oJ1sAD7IoNs), 0:48 to 1:10 |
 | Truck at a plant gate | [GIF](demo/casos/camion_porton.gif) | [MP4](demo/casos/camion_porton.mp4) | [YouTube xSYAfvnfUg4](https://www.youtube.com/watch?v=xSYAfvnfUg4), first 7 s |
 | Night, infrared | [GIF](demo/casos/noche_infrarrojo.gif) | [MP4](demo/casos/noche_infrarrojo.mp4) | [Lewis Surveillance, YouTube Roc4YDz6kjo](https://www.youtube.com/watch?v=Roc4YDz6kjo), 1:43 to 2:32 |
