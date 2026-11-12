@@ -76,6 +76,10 @@ Además del modo en vivo, el sistema tiene una versión para video grabado que t
 
 El sistema funciona de punta a punta y en tiempo real en una computadora común. Lo que más pesa en el resultado no es el modelo sino la cámara: con una cámara ubicada para leer patentes y un auto que frena en la barrera, las lecturas son firmes; con patentes chicas, o de noche con poca resolución, aparecen pérdidas. Por eso, en una instalación real, lo primero es revisar la ubicación de la cámara y medir con sus propias imágenes.
 
+## En una sola consola
+
+Este lector también funciona dentro de la [búsqueda en grabaciones](https://github.com/TomaasGonzalezzz/Video-Search-Demo), como la pestaña *Accesos*: ahí los pasos por el portón se ven junto a las demás cámaras, con lo que hay que revisar arriba, quién quedó adentro y las listas del barrio editables desde la misma pantalla.
+
 ## Límites y cuidados
 
 - **Pocos videos de prueba.** Los resultados muestran que el sistema funciona, pero el número real hay que medirlo con la cámara de cada lugar.

@@ -59,6 +59,10 @@ Besides the live mode, there is a version for recorded video that also tracks ev
 
 The system works end to end and in real time on an ordinary computer. What matters most is not the model but the camera: with a camera placed to read plates and a car that stops at the barrier, readings are solid; with small plates, or at night with low resolution, some are missed. In a real installation the first step is to check the camera placement and measure on its own images.
 
+## In one console
+
+This reader also works inside the [recording search console](https://github.com/TomaasGonzalezzz/Video-Search-Demo), as its *Accesos* tab: gate passes are shown next to the other cameras, with what needs checking at the top, who is still inside, and the community's lists editable from the same screen.
+
 ## Limits and care
 
 - **Few test videos.** The results show that the system works; the real figure has to be measured on each site's camera.
